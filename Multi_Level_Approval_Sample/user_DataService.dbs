@@ -1,0 +1,81 @@
+<data name="user_DataService" serviceNamespace="http://ws.wso2.org/dataservice">
+   <config enableOData="false" id="default">
+      <property name="carbon_datasource_name">MySQL_Local</property>
+   </config>
+   <query id="select_with_key_user_query" useConfig="default">
+      <sql>SELECT user_id, name, manager_id FROM user WHERE user_id=?</sql>
+      <result element="userCollection" rowName="user">
+         <element column="user_id" name="user_id" xsdType="xs:integer"/>
+         <element column="name" name="name" xsdType="xs:string"/>
+         <element column="manager_id" name="manager_id" xsdType="xs:integer"/>
+      </result>
+      <param name="user_id" ordinal="1" sqlType="INTEGER"/>
+   </query>
+   <query id="update_user_query" useConfig="default">
+      <sql>UPDATE user SET name=?,manager_id=? WHERE user_id=?</sql>
+      <param name="name" ordinal="1" sqlType="STRING"/>
+      <param name="manager_id" ordinal="2" sqlType="INTEGER"/>
+      <param name="user_id" ordinal="3" sqlType="INTEGER"/>
+   </query>
+   <query id="select_all_user_query" useConfig="default">
+      <sql>SELECT user_id, name, manager_id FROM user</sql>
+      <result element="userCollection" rowName="user">
+         <element column="user_id" name="user_id" xsdType="xs:integer"/>
+         <element column="name" name="name" xsdType="xs:string"/>
+         <element column="manager_id" name="manager_id" xsdType="xs:integer"/>
+      </result>
+   </query>
+   <query id="select_managr_for_a_user" useConfig="default">
+      <sql>SELECT manager.manager_id, manager.name FROM manager INNER JOIN user ON user.manager_id=manager.manager_id WHERE user.user_id=?</sql>
+      <result element="managerUserColloection" rowName="manager">
+         <element column="manager_id" name="manager_id" xsdType="xs:integer"/>
+         <element column="name" name="name" xsdType="string"/>
+      </result>
+      <param name="user_id" ordinal="1" sqlType="INTEGER"/>
+   </query>
+   <query id="delete_user_query" useConfig="default">
+      <sql>DELETE FROM user WHERE user_id=?</sql>
+      <param name="user_id" ordinal="1" sqlType="INTEGER"/>
+   </query>
+   <query id="insert_user_query" useConfig="default">
+      <sql>INSERT INTO user(name,manager_id) VALUES(?,?)</sql>
+      <param name="name" ordinal="1" sqlType="STRING"/>
+      <param name="manager_id" ordinal="2" sqlType="INTEGER"/>
+   </query>
+   <operation name="insert_user_operation">
+      <call-query href="insert_user_query">
+         <with-param name="manager_id" query-param="manager_id"/>
+         <with-param name="name" query-param="name"/>
+      </call-query>
+   </operation>
+   <operation name="update_user_operation">
+      <call-query href="update_user_query">
+         <with-param name="manager_id" query-param="manager_id"/>
+         <with-param name="user_id" query-param="user_id"/>
+         <with-param name="name" query-param="name"/>
+      </call-query>
+   </operation>
+   <operation name="select_all_user_operation">
+      <call-query href="select_all_user_query"/>
+   </operation>
+   <operation name="delete_user_operation">
+      <call-query href="delete_user_query">
+         <with-param name="user_id" query-param="user_id"/>
+      </call-query>
+   </operation>
+   <operation name="select_with_key_user_operation">
+      <call-query href="select_with_key_user_query">
+         <with-param name="user_id" query-param="user_id"/>
+      </call-query>
+   </operation>
+   <operation name="select_managr_for_a_user_operation">
+      <call-query href="select_managr_for_a_user">
+         <with-param name="user_id" query-param="user_id"/>
+      </call-query>
+   </operation>
+   <resource method="GET" path="getManager">
+      <call-query href="select_managr_for_a_user">
+         <with-param name="user_id" query-param="user_id"/>
+      </call-query>
+   </resource>
+</data>
